@@ -1,0 +1,64 @@
+@startuml unsubscsribe
+    autonumber
+    participant Pub [
+        = Publisher
+    ]
+    participant Server [
+        = Server
+    ]
+    participant ConfTopicMapper [
+        = ConfTopicMapper
+    ]
+    participant Topic [
+        = Topic
+    ]
+    participant Sub [
+        = Subscriber
+    ]
+
+    
+    Note over Pub, Sub: Data distribution in the process
+
+    alt Pub un-publishing
+        Pub ->> Server: SIP BYE
+        Server ->> Pub: SIP ACK
+        Server ->> Sub: SIP BYE
+        Sub ->> Server: SIP ACK
+        Server ->> ConfTopicMapper: REST PATCH/DELETE
+        Note right of Server: to remove a Pub\nfrom a Topic in the DB
+        ConfTopicMapper ->> Topic: REST PATCH
+        Note right of ConfTopicMapper: to remove Pub\nin a Topic instance
+    
+        Note over Topic: Tear down a Topic instance
+        
+        
+        Pub ->x?: Stop RTP streaming
+        
+        
+        ?x-> Sub: Stop receiving RTP Stream
+        
+    else Sub unsubscribing
+        Sub ->> Server: SIP BYE
+        Server ->> Sub: SIP ACK
+        
+        Note over Sub: Stop receiving RTP Stream
+        
+        
+        activate Server
+        Server ->> Server: Check if one or more Subs in a Topic
+        deactivate Server
+        alt Topic has no Sub
+            Pub ->> Server: SIP ACK
+            Server ->> ConfTopicMapper: REST PATCH/DELETE
+            Note right of Server: to remove a Pub from a topic in the DB
+            ConfTopicMapper ->> Topic: REST PATCH
+            Note right of ConfTopicMapper: to remove the Pub in a Topic instance
+            activate Topic
+                Note over Topic: Tear down a Topic instance
+            deactivate Topic
+            Pub ->x?: Stop RTP streaming
+        else Topic has one or more Subs
+            Pub ->> Topic: Continue streaming for other Subs
+        end
+    end
+@enduml

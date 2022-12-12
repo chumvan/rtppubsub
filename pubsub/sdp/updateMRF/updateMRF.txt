@@ -1,0 +1,32 @@
+// From Server to the MRF
+// Currently, this information is delivered using REST
+// The information about the in-coming and out-going addresses 
+// in the SDP equivalent can be illustrated as:
+
+...
+t=0 0
+m=text 6430 RTP/AVP 100
+c=IN IP4 10.5.0.3
+a=rtpmap:100 t140/1000
+a=recvonly
+
+m=text 6432 RTP/AVP 101
+c=IN IP4 10.5.0.3
+a=rtpmap:101 t140/1000
+a=sendonly
+
+
+m=text 6420 RTP/AVP 102
+c=IN IP4 10.5.0.4
+a=rtpmap:102 t140/1000
+a=recvonly
+
+c=IN IP4 10.5.0.5
+a=rtpmap:102 t140/1000
+a=recvonly
+
+c=IN IP4 10.5.0.6
+a=rtpmap:102 t140/1000
+a=recvonly
+
+...

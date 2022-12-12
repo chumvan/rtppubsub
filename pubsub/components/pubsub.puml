@@ -1,0 +1,16 @@
+@startuml pubsub 
+
+json "<b>Publisher" as Pub {
+    "SIPUA": "to communicate with the ConfFactory and the SIPServer in Server",
+    "RTPSender": "to send packets to the MRF"
+}
+
+json "<b>Subscriber" as Sub {
+    "SIPUA" : "to communicate with the SIPServer in Server",
+    "RTPReceiver": "to receive packets forwaded from the MRF",
+    "RESTClient": "to request a confUri from the ConfTopicMapper given a topic"
+}
+
+Pub -[hidden]-> Sub
+
+@enduml

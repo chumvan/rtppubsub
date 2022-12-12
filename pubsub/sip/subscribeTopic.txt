@@ -1,0 +1,20 @@
+// iotConfUri could be: sip:iotConference@10.5.0.7:5080
+
+INVITE <iotConfUri> SIP/2.0
+Via: SIP/2.0/UDP 10.5.0.4:5062
+;branch=z9hG4bKhjhs8ass83
+Max-Forwards: 70
+To: <iotConfUri>
+From: Subscriber <sip:subscriber@10.5.0.4:5062>;tag=32331
+Call-ID: v7GjtSrsDgaQYOWjumtx4k3IB580O36u
+CSeq: 1 INVITE
+Contact: <sip:subscriber@10.5.0.4:5062;transport=udp>;+sip.instance="<urn:uuid:173dbf15-7928-11ed-9344-02420a050002>
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER,
+SUBSCRIBE, NOTIFY, UPDATE
+Accept: application/sdp
+Supported: replaces, outbound
+User-Agent: Receiver SIP UAC
+Content-Type: application/sdp
+Content-Length: ...
+
+(SDP not shown)
