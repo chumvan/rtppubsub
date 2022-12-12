@@ -44,44 +44,36 @@
         alt Topic exists
             autonumber 5.3
             Pub ->> Server: SIP INVITE\n <i>sip:<color:red>iotConfUri</color>@10.5.0.7:5040</i>
-        note right of Pub: m=text 6420 RTP/AVP 100\nc=IN IP4 10.5.0.2\n<color:blue>a=topic:iotTopic</color>\na=rtpmap:100 <color:orange>t140/1000</color>\n<color:green>a=sendonly</color>
+            note right of Pub: m=text 6420 RTP/AVP 100\nc=IN IP4 10.5.0.2\na=rtpmap:100 <color:orange>t140/1000</color>\n<color:green>a=sendonly</color>
             Server ->> ConfTopicMapper: HTTP PATCH request\n<i>http://10.5.0.8:8080/api/v1/topicMode?topic=<color:blue>iotTopic</color></i>\n <i> { ... </i>\n  <i>"User":"publisher",</i>\n<i>"EntityUrl":"sip:publisher@10.5.0.2:5060",</i>\n<i>"Role":"sendonly",</i>\n  <i>...}</i>
             ConfTopicMapper ->> Server: HTTP PATCH response
             Server ->> Pub: SIP 200 OK
-            note right of Pub: `m=text 6420 RTP/AVP 100\n c=IN IP4 10.5.0.3\n a=confUri:iotConfUri\n a=rtpmap:100 t140/1000\n a=sendonly`
+            note left of Server: m=text 6430 RTP/AVP 100\nc=IN IP4 10.5.0.3\n<color:blue>a=topic:iotTopic</color>\n<color:red>a=confUri:iotConfUri</color>\na=rtpmap:100 t140/1000\n<color:green>a=recvonly</color>
             
             Pub <-> Sub: continue as before
             
         else #White Topic NOT FOUND 404
             autonumber 5.3
-                Pub ->> Server: SIP INVITE to ConfFactoryUri
-                note right of Pub: `m=text 6420 RTP/AVP 100\n c=IN IP4 10.5.0.3\n a=topic:iotTopic\n a=rtpmap:100 t140/1000\n a=sendonly`
-                Server ->> ConfTopicMapper: HTTP POST\n to create a ConfTopic mapping
+                Pub ->> Server: SIP INVITE\n <i>sip:confFactory@10.5.0.7:5080</i>
+                note right of Pub: m=text 6420 RTP/AVP 100\nc=IN IP4 10.5.0.2\n<color:blue>a=topic:iotTopic</color>\na=rtpmap:100 <color:orange>t140/1000</color>\n<color:green>a=sendonly</color>                
+                Server ->> ConfTopicMapper: HTTP POST request\n <i>http://10.5.0.8:8080:/api/v1/topicMode/confInfos</i>\n<i>{...</i>\n <i>"ConfID":"123confIDxyz"</i>,\n <i>"Topic":"<color:blue>iotTopic</color></i>",\n <i>...}</i>
                 activate Server
-                    ConfTopicMapper ->> Topic: HTTP POST - create a topic instance
-                    activate ConfTopicMapper
-                        Topic ->> ConfTopicMapper: HTTP POST response
-                    deactivate ConfTopicMapper
-                    ConfTopicMapper ->> Server: HTTP POST response
-                    Server ->> Pub: SIP 200 OK
+                ConfTopicMapper ->> Topic: HTTP POST\n<i>http://10.5.0.3:8060/</i>\n<i> { ... </i>\n  <i>a list of Participants</i>\n  <i>...}</i>
+                activate ConfTopicMapper
+                Topic ->> ConfTopicMapper: HTTP POST response
+                deactivate ConfTopicMapper
+                ConfTopicMapper ->> Server: HTTP POST response
+                note over Server: create a Conference in Server
+                Server ->> Pub: SIP 200 OK
+                note left of Server: m=text 6430 RTP/AVP 100\nc=IN IP4 10.5.0.3\n<color:blue>a=topic:iotTopic</color>\n<color:red>a=confUri:iotConfUri</color>\na=rtpmap:100 t140/1000\n<color:green>a=recvonly</color>
                 deactivate Server
-            note left of Server: `m=text 6420 RTP/AVP 100\n c=IN IP4 10.5.0.3\n a=confUri:iotConfUri\n a=rtpmap:100 t140/1000\n a=sendonly`
         end
     end
     autonumber 6
     par Data publishing
-        Pub ->> Topic: RTP Streaming
-    else Data subscription and distributing 
-        Sub ->> ConfTopicMapper: HTTP GET request ConfUri given Topic
-        ConfTopicMapper ->> Sub: HTTP GET response with ConfUri + format
-        Sub ->> Server: SIP INVITE with ConfUri
-        note left of Sub: `m=text 6421 RTP/AVP 100\n c= IN IP4 10.5.0.4\n a=confUri:iotConfUri\n a=rtpmap:100 t140/1000\n a=recvonly`
-        Server ->> Sub: SIP 200 OK
-        note right of Server: `m=text 6421 RTP/AVP 100\n ...\n a=recvonly`\n for Sub to receive from conf
-        note over Sub: Prepare to receive RTP packets        
-        Server ->> ConfTopicMapper: HTTP PATCH - update users
-        ConfTopicMapper ->> Topic: HTTP PUT - update users\n at the Topic instance
-        note over Topic: Prepare for forwarding
-        Topic ->> Sub: RTP Streaming
+        Pub ->> Topic: the same operations
+    else Data subscription and distributing
+        Topic ->> Sub: the same operations
     end
+
 @enduml

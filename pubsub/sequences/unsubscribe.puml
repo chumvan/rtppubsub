@@ -2,60 +2,60 @@
     autonumber
     participant Pub [
         = Publisher
+        ----
+        IP: 10.5.0.2
     ]
     participant Server [
         = Server
+        ----
+        IP: 10.5.0.7
     ]
     participant ConfTopicMapper [
         = ConfTopicMapper
+        ----
+        IP:10.5.0.8
     ]
     participant Topic [
         = Topic
+        ----
+        IP:10.5.0.3
     ]
     participant Sub [
         = Subscriber
+        ----
+        10.5.0.4
     ]
 
+
     
-    Note over Pub, Sub: Data distribution in the process
+    Note over Pub, Sub #WhiteSmoke: Data distribution in the process
 
     alt Pub un-publishing
-        Pub ->> Server: SIP BYE
+        Pub ->> Server: SIP BYE\n<i>sip:<color:red>iotConfUri</color>@10.5.0.7:5040</i>
         Server ->> Pub: SIP ACK
-        Server ->> Sub: SIP BYE
-        Sub ->> Server: SIP ACK
-        Server ->> ConfTopicMapper: REST PATCH/DELETE
-        Note right of Server: to remove a Pub\nfrom a Topic in the DB
-        ConfTopicMapper ->> Topic: REST PATCH
-        Note right of ConfTopicMapper: to remove Pub\nin a Topic instance
-    
-        Note over Topic: Tear down a Topic instance
-        
-        
         Pub ->x?: Stop RTP streaming
-        
-        
-        ?x-> Sub: Stop receiving RTP Stream
-        
+        Server ->> Sub: SIP BYE\n<i>sip:subscriber@10.5.0.4:5071</i>
+        Sub ->> Server: SIP ACK
+        Server ->> ConfTopicMapper: HTTP PATCH request\n<i>http://10.5.0.8:8080/api/v1/topicMode/confInfos/<color:blue>iotTopic</color>/users</i>
+        ConfTopicMapper ->> Topic: HTTP PATCH request\n <i>http://10.5.0.3:8060/users/</i> 
+        Note over Topic: Tear down a Topic instance
+        Topic ->> ConfTopicMapper: HTTP PATCH response
+        ConfTopicMapper ->> Server: HTTP PATCH response 
     else Sub unsubscribing
-        Sub ->> Server: SIP BYE
+        Sub ->> Server: SIP BYE\n<i>sip:<color:red>iotConfUri</color>@10.5.0.7:5040</i>
         Server ->> Sub: SIP ACK
         
         Note over Sub: Stop receiving RTP Stream
         
         
-        activate Server
         Server ->> Server: Check if one or more Subs in a Topic
-        deactivate Server
         alt Topic has no Sub
+            Server ->> Pub: SIP BYE\n<i>sip:publisher@10.5.0.2:5060</i>
             Pub ->> Server: SIP ACK
-            Server ->> ConfTopicMapper: REST PATCH/DELETE
-            Note right of Server: to remove a Pub from a topic in the DB
-            ConfTopicMapper ->> Topic: REST PATCH
-            Note right of ConfTopicMapper: to remove the Pub in a Topic instance
-            activate Topic
-                Note over Topic: Tear down a Topic instance
-            deactivate Topic
+            Server ->> ConfTopicMapper: HTTP PATCH request\n<i>http://10.5.0.8:8080/api/v1/topicMode/confInfos/<color:blue>iotTopic</color>/users</i>
+            ConfTopicMapper ->> Topic: HTTP PATCH
+            ConfTopicMapper ->> Topic: HTTP PATCH request\n <i>http://10.5.0.3:8060/users/</i> 
+            Note over Topic: Tear down a Topic instance
             Pub ->x?: Stop RTP streaming
         else Topic has one or more Subs
             Pub ->> Topic: Continue streaming for other Subs

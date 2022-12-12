@@ -70,20 +70,10 @@
     end
     autonumber 5
     par Data publishing
-        Pub ->> Topic: RTP Streaming
-    else Data subscription and distributing 
-        Sub ->> ConfTopicMapper: HTTP GET request\n <i>http://10.5.0.8:8080/api/v1/topicMode/confInfos?topic=<color:blue>iotTopic</color></i>
-        ConfTopicMapper ->> Sub: HTTP GET response\n <i> { ... </i>\n  <i>"ConfUri":"<color:red>iotConfUri</color>",</i>\n  <i>...}</i>
-        Sub ->> Server: SIP INVITE sip:<color:red>iotConfUri</color>@10.5.0.7:5040
-        note left of Sub: m=text 6421 RTP/AVP 100\nc= IN IP4 10.5.0.4\n<color:red>a=confUri:iotConfUri</color>\na=rtpmap:100 t140/1000\n<color:green>a=recvonly</color>
-        Server ->> Sub: SIP 200 OK
-        note right of Server: m=text 6421 RTP/AVP 100\nc=IN IP4 10.5.0.3\n<color:red>a=confUri:iotConfUri</color>\na=rtpmap:100 t140/1000\n<color:green>a=sendonly</color>
-
-        Server ->> ConfTopicMapper: HTTP PATCH\n <i>http://10.5.0.8:8080/api/v1/topicMode/confInfos/<color:blue>iotTopic</color>/users/<userID></i>
-        ConfTopicMapper ->> Topic: HTTP PUT\n <i>http://10.5.0.3:8060/users/</i>
-        Topic ->> Sub: RTP Streaming
+        Pub ->> Topic: the same operations
+    else Data subscription and distributing
+        Topic ->> Sub: the same operations
     end
-
 
 
 @enduml
