@@ -1,7 +1,7 @@
 @startuml conftopicmapper
 json "<b>Conference Topic Mapper" as CFM {
-    "RESTServer": "to receive update from Server",
-    "RESTClient": "to update the IP-addresses at an Media Resource Function",
+    "HTTPServer": "to receive update from Server",
+    "HTTPClient": "to update the IP-addresses at an Media Resource Function",
     "Database": "to maintain the Topic <-> Conference mapping"
 }
 @enduml

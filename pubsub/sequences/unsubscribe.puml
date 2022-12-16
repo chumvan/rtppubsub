@@ -1,4 +1,5 @@
 @startuml unsubscsribe
+    title Unsubscribe Sequence
     autonumber
     participant Pub [
         = Publisher

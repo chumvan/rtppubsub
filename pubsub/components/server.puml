@@ -2,6 +2,6 @@
 json "<b>Server" as S {
     "ConfFactory": "a SIP Conference Server addressed by a ConfURI",
     "SIPServer": "a SIP Server including Registrar and Redirect function",
-    "RESTClient": "to update the ConferenceURI-Topic mapping"
+    "HTTPClient": "to update the ConferenceURI-Topic mapping"
 }
 @enduml

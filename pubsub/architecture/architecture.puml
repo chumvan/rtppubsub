@@ -13,17 +13,17 @@ node Publisher as Pub {
 package Network {
 node Server as Server {
     [SIPServer] #Orange 
-    [RESTClient] as ServerRESTC #LightBlue 
+    [HTTPClient] as ServerHTTPC #LightBlue 
     [ConferenceFactory] #OrangeRed 
 }
 
 node Topic {
-    [RESTServer] as TopicRESTS #LightBlue 
+    [HTTPServer] as TopicHTTPS #LightBlue 
     [MRF] #LightGreen 
 }
 
 node ConfTopicMapper {
-    [RESTServer] as MapREST #LightBlue
+    [HTTPServer] as MapHTTP #LightBlue
     database DB
 }
 }
@@ -32,18 +32,18 @@ node ConfTopicMapper {
 package Subs {
 node Subscriber1 as Sub1 {
     [SIPClient] as SubSIPC1 #Orange 
-    [RESTclient] as SubRESTC1 #LightBlue 
+    [HTTPclient] as SubHTTPC1 #LightBlue 
     [RTPReceiver] as RTPReceiver1#LightGreen 
 }
 
 node Subscriber2 as Sub2 {
     [SIPClient] as SubSIPC2 #Orange 
-    [RESTclient] as SubRESTC2 #LightBlue 
+    [HTTPclient] as SubHTTPC2 #LightBlue 
     [RTPReceiver] as RTPReceiver2 #LightGreen 
 }
 node Subscriber3 as Sub3 {
     [SIPClient] as SubSIPC3 #Orange 
-    [RESTclient] as SubRESTC3 #LightBlue 
+    [HTTPclient] as SubHTTPC3 #LightBlue 
     [RTPReceiver] as RTPReceiver3#LightGreen 
 }
 }
@@ -52,14 +52,14 @@ node Subscriber3 as Sub3 {
 
 [PubSIPC] <-[#OrangeRed]-> [ConferenceFactory]: Publish Topic
 
-[ServerRESTC] <-[#Blue,dashed]-> MapREST: Update Topic-Conference map
+[ServerHTTPC] <-[#Blue,dashed]-> MapHTTP: Update Topic-Conference map
 
-[ServerRESTC] -[#Blue,dashed]-> TopicRESTS: Update forwarding addr
+[ServerHTTPC] -[#Blue,dashed]-> TopicHTTPS: Update forwarding addr
 
-[SubRESTC1] <-[#Blue,dashed]-> MapREST: Get ConfUri
-[MapREST] <-> DB: ""
-' [SubRESTC2] <-[#Blue,dashed]-> ConfTopicMapper: Get ConfUri
-' [SubRESTC3] <-[#Blue,dashed]-> ConfTopicMapper: Get ConfUri
+[SubHTTPC1] <-[#Blue,dashed]-> MapHTTP: Get ConfUri
+[MapHTTP] <-> DB: ""
+' [SubHTTPC2] <-[#Blue,dashed]-> ConfTopicMapper: Get ConfUri
+' [SubHTTPC3] <-[#Blue,dashed]-> ConfTopicMapper: Get ConfUri
 
 [PubSIPC] <-[#Orange]-> [SIPServer]: Join Conference
 [SubSIPC1] <-[#Orange]-> [SIPServer]: Join Conference
