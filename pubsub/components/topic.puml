@@ -1,6 +1,6 @@
 @startuml Topic
 json "**Topic** as a Media Resource Function-**MRF**" as MRF {
     "RESTServer": "to receive update from the Conference Topic Mapper",
-    "RTPRelay": "to forward the RTP packets from a Publisher to Subscribers"
+    "MRF": "to forward the RTP packets from a Publisher to Subscribers"
 }
 @enduml

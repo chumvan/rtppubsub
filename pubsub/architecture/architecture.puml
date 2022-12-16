@@ -1,0 +1,74 @@
+@startuml
+left to right direction
+
+
+title IoT PubSub System using RTP/SIP
+
+package Pubs{
+node Publisher as Pub {
+    [SIPClient] as PubSIPC #Orange 
+    [RTPSender] #LightGreen 
+}
+}
+package Network {
+node Server as Server {
+    [SIPServer] #Orange 
+    [RESTClient] as ServerRESTC #LightBlue 
+    [ConferenceFactory] #OrangeRed 
+}
+
+node Topic {
+    [RESTServer] as TopicRESTS #LightBlue 
+    [MRF] #LightGreen 
+}
+
+node ConfTopicMapper {
+    [RESTServer] as MapREST #LightBlue
+    database DB
+}
+}
+
+
+package Subs {
+node Subscriber1 as Sub1 {
+    [SIPClient] as SubSIPC1 #Orange 
+    [RESTclient] as SubRESTC1 #LightBlue 
+    [RTPReceiver] as RTPReceiver1#LightGreen 
+}
+
+node Subscriber2 as Sub2 {
+    [SIPClient] as SubSIPC2 #Orange 
+    [RESTclient] as SubRESTC2 #LightBlue 
+    [RTPReceiver] as RTPReceiver2 #LightGreen 
+}
+node Subscriber3 as Sub3 {
+    [SIPClient] as SubSIPC3 #Orange 
+    [RESTclient] as SubRESTC3 #LightBlue 
+    [RTPReceiver] as RTPReceiver3#LightGreen 
+}
+}
+
+
+
+[PubSIPC] <-[#OrangeRed]-> [ConferenceFactory]: Publish Topic
+
+[ServerRESTC] <-[#Blue,dashed]-> MapREST: Update Topic-Conference map
+
+[ServerRESTC] -[#Blue,dashed]-> TopicRESTS: Update forwarding addr
+
+[SubRESTC1] <-[#Blue,dashed]-> MapREST: Get ConfUri
+[MapREST] <-> DB: ""
+' [SubRESTC2] <-[#Blue,dashed]-> ConfTopicMapper: Get ConfUri
+' [SubRESTC3] <-[#Blue,dashed]-> ConfTopicMapper: Get ConfUri
+
+[PubSIPC] <-[#Orange]-> [SIPServer]: Join Conference
+[SubSIPC1] <-[#Orange]-> [SIPServer]: Join Conference
+' [SubSIPC2] <-[#Orange]-> [SIPServer]: ""
+' [SubSIPC3] <-[#Orange]-> [SIPServer]: ""
+
+[RTPSender] -[#Green,bold]-> [MRF]: RTP Stream
+[MRF] -[#Green,bold]-> [RTPReceiver1]: ""
+[MRF] -[#Green,bold]-> [RTPReceiver2]: ""
+[MRF] -[#Green,bold]-> [RTPReceiver3]: ""
+
+@enduml
