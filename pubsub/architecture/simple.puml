@@ -1,0 +1,37 @@
+@startuml simple PubSub
+left to right direction
+title Simple PubSub Visualization
+
+package Publishers{
+    [Publisher] as Pub
+}
+
+package Intermediate {
+    node Broker {
+        [Topic] as Topic1
+        [Topic] as Topic2
+    }
+    node Middleware {
+
+    }
+}
+
+
+
+package Subscribers{
+    [Subscriber] as Sub1
+    [Subscriber] as Sub2
+    [Subscriber] as Sub3 
+}
+
+Pub -[#Orange]-> Topic1: associate data
+Sub1 -[#Orange]-> Topic1: indicate interest
+Sub2 -[#Orange]-> Topic1: indicate interest
+
+Pub -[#Green,bold]-> Middleware: send data
+Middleware -[#Green,bold]-> Sub1: send data
+Middleware -[#Green,bold]-> Sub2: send data
+
+
+
+@enduml
